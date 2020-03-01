@@ -93,36 +93,35 @@ class Graph(object):
     def __repr__(self):
         return ('Graph(vertexes={})').format(len(self.vertexes))
 
-    def create_from_file(self, filename, digraph=False):
+    def create(self, adjacency_list, digraph=False):
         """Create a graph from a file with a matrix of distances"""
 
         # read matrix of distances from file
-        with open(filename, 'r') as adjacency_list:
-            for row_idx, row in enumerate(adjacency_list):
-                # the first row contains the number of vertexes
-                if row_idx == 0:
-                    number_of_vertexes = int(row)
+        for row_idx, row in enumerate(adjacency_list):
+            # the first row contains the number of vertexes
+            if row_idx == 0:
+                number_of_vertexes = int(row)
 
-                    # initialize the vertex list
-                    for i in range(number_of_vertexes):
-                        self.vertexes.append(Vertex(str(i)))
+                # initialize the vertex list
+                for i in range(number_of_vertexes):
+                    self.vertexes.append(Vertex(str(i)))
 
-                    continue
+                continue
 
-                # from the second row in the lines are structured as:
-                # 'from to weight'
-                line = row.split(' ')
-                from_idx = int(line[0])
-                to_idx = int(line[1])
-                weight = int(line[2])
+            # from the second row in the lines are structured as:
+            # 'from to weight'
+            line = row.split(' ')
+            from_idx = int(line[0])
+            to_idx = int(line[1])
+            weight = int(line[2])
 
-                v_from = self.vertexes[from_idx]
-                v_to = self.vertexes[to_idx]
+            v_from = self.vertexes[from_idx]
+            v_to = self.vertexes[to_idx]
 
-                v_from.add_edge(v_to, weight)
+            v_from.add_edge(v_to, weight)
 
-                if not digraph:
-                    v_to.add_edge(v_from, weight)
+            if not digraph:
+                v_to.add_edge(v_from, weight)
 
     def reset(self):
         """Reset the graph to run dijkstra from other start nodes"""
