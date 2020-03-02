@@ -149,25 +149,39 @@ def create_adjacency_list(grid):
     return [str(node_count)] + adjacency
 
 
-def main(maze, algorithm):
+def main():
     """Solve the maze using graphs"""
-    grid = create_grid_from_image(maze)
-    adjacency_list = create_adjacency_list(grid)
-
-
-if __name__ == '__main__':
-    # handle script arguments
     parser = argparse.ArgumentParser(
         description='Calculate paths in mazes.'
     )
     parser.add_argument('maze',
                         help='path to png file containing the the maze')
-    parser.add_argument('type',
+    parser.add_argument('algorithm',
                         help='what algorithm to find the path')
     args = parser.parse_args()
 
-    # call main function
-    main(
-        maze=args.maze,
-        algorithm=args.type,
-    )
+    # read arguments
+    maze = args.maze
+    algorithm = args.algorithm
+
+    # create grid and adjacency list from png file
+    grid = create_grid_from_image(maze)
+    adjacency_list = create_adjacency_list(grid)
+
+    # create graph from adjacency list
+    graph = Graph()
+    graph.create(adjacency_list)
+
+    # get initial and final nodes
+    start = graph.vertexes[0]
+    end = graph.vertexes[-1]
+
+    # solve using algorithm
+    if algorithm == 'dijkstra':
+        graph.path(start, end, run_dijkstra=True)
+    else:
+        print('Not implemented yet :)')
+
+
+if __name__ == '__main__':
+    main()
