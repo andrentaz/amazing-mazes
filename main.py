@@ -140,7 +140,7 @@ def create_adjacency_list(grid):
             continue
 
         if i == 1:
-            add_node_to_adjacency(adjacency, j, idx, node_count)
+            add_node_to_adjacency(adjacency, idx, j, node_count)
             grid[-1][idx] = str(node_count)
             node_count += 1
             break
