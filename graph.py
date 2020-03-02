@@ -23,7 +23,7 @@ class Edge(object):
 
     def __repr__(self):
         return (
-            'Edge(source={} '
+            'Edge(source={}, '
             'neighboor={}, '
             'distance={})'
         ).format(
@@ -145,13 +145,15 @@ class Graph(object):
 
         # setup vertex heap based in distance
         start.distance = 0
-        vertex_heap = BinaryMinHeap(self.vertexes)
+        vertexes = self.vertexes[:]
+        vertex_heap = BinaryMinHeap(vertexes)
         vertex_heap.build_min_heap()
 
         # run the loop checking for edges
         while vertex_heap.heap:
             # get the next in the priority queue
             node = vertex_heap.extract_min()
+            changed = False
 
             # loop over the node edges
             for edge in node.edges:
@@ -164,9 +166,13 @@ class Graph(object):
                 if path_distance < neighboor.distance:
                     neighboor.distance = path_distance
                     neighboor.previous = node
+                    changed = True
 
             # check if the end node is the one popped and the algorithm can end
             node.visited = True
+            if changed:
+                vertex_heap.build_min_heap()
+
             if end and node == end:
                 break
 
