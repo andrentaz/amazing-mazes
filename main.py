@@ -80,8 +80,6 @@ def create_adjacency_list(grid):
     node_count = 0
 
     # convert grid first row to list of adjacency
-    import ipdb
-    ipdb.set_trace()
     for idx, i in enumerate(grid[0]):
         if i == 0:
             continue
@@ -148,7 +146,7 @@ def create_adjacency_list(grid):
             break
 
     # return list of adjacency
-    return adjacency
+    return [str(node_count)] + adjacency
 
 
 def main(maze, algorithm):
