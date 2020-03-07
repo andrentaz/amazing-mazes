@@ -104,7 +104,7 @@ class Graph(object):
 
                 # initialize the vertex list
                 for i in range(number_of_vertexes):
-                    self.vertexes.append(Vertex(str(i)))
+                    self.vertexes.append(Vertex(i))
 
                 continue
 
@@ -145,15 +145,13 @@ class Graph(object):
 
         # setup vertex heap based in distance
         start.distance = 0
-        vertexes = self.vertexes[:]
-        vertex_heap = BinaryMinHeap(vertexes)
-        vertex_heap.build_min_heap()
+        vertex_heap = BinaryMinHeap()
+        vertex_heap.add_to_heap(start)
 
         # run the loop checking for edges
         while vertex_heap.heap:
             # get the next in the priority queue
             node = vertex_heap.extract_min()
-            changed = False
 
             # loop over the node edges
             for edge in node.edges:
@@ -164,14 +162,14 @@ class Graph(object):
                 path_distance = node.distance + edge.distance
 
                 if path_distance < neighboor.distance:
+                    if neighboor.distance == float('inf'):
+                        vertex_heap.add_to_heap(neighboor)
+
                     neighboor.distance = path_distance
                     neighboor.previous = node
-                    changed = True
 
             # check if the end node is the one popped and the algorithm can end
             node.visited = True
-            if changed:
-                vertex_heap.build_min_heap()
 
             if end and node == end:
                 break

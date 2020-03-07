@@ -14,9 +14,10 @@ from collections import deque
 
 class BinaryMinHeap(object):
     """A simple implementation of a BinaryMinHeap"""
-    def __init__(self, heap):
+    def __init__(self):
         super(BinaryMinHeap, self).__init__()
-        self.heap = heap
+        self.heap = []
+        self.unheaped = True
 
     def __repr__(self):
         return (
@@ -51,17 +52,26 @@ class BinaryMinHeap(object):
         for i in reversed(range(len(array)//2)):
             self.min_heapify(i)
 
+        self.unheaped = False
+
     def extract_min(self):
         """Get minimum element preserving the heap property"""
         # change the first and last elements
+        if self.unheaped:
+            self.build_min_heap()
+
         self.heap[0], self.heap[-1] = self.heap[-1], self.heap[0]
         minimum = self.heap.pop()
 
-        # restores the heap property
-        self.build_min_heap()
+        self.unheaped = True
 
         # return the minimum
         return minimum
+
+    def add_to_heap(self, node):
+        """Add node to heap, preserving the heap property"""
+        idx = len(self.heap)
+        self.heap.append(node)
 
 
 class Queue(object):

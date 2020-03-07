@@ -31,7 +31,7 @@ def create_grid_from_image(maze):
         row = pixels[offset:offset+width]
         grid.append(row)
 
-    return grid
+    return grid, img
 
 
 def create_adjacency_list(grid):
@@ -74,6 +74,7 @@ def create_adjacency_list(grid):
 
 
     # adjacency list information
+    node_positions = []
     adjacency = []
     height = len(grid)
     width = len(grid[0])
@@ -85,6 +86,7 @@ def create_adjacency_list(grid):
             continue
 
         if i == 1:
+            node_positions.append((0, idx,))
             add_node_to_adjacency(adjacency, 0, idx, node_count)
             grid[0][idx] = str(node_count)
             node_count += 1
@@ -114,6 +116,7 @@ def create_adjacency_list(grid):
 
             # 1) case we have a bifurcation
             if freedom_degree > 2:
+                node_positions.append((i, j,))
                 add_node_to_adjacency(adjacency, j, i, node_count)
                 grid[i][j] = str(node_count)
                 node_count += 1
@@ -121,6 +124,7 @@ def create_adjacency_list(grid):
 
             # 2) case we have a junction
             if top + bottom == 1 and left + right == 1:
+                node_positions.append((i, j,))
                 add_node_to_adjacency(adjacency, j, i, node_count)
                 grid[i][j] = str(node_count)
                 node_count += 1
@@ -128,6 +132,7 @@ def create_adjacency_list(grid):
 
             # 3) case a dead end
             if freedom_degree == 1:
+                node_positions.append((i, j,))
                 add_node_to_adjacency(adjacency, j, i, node_count)
                 grid[i][j] = str(node_count)
                 node_count += 1
@@ -140,13 +145,14 @@ def create_adjacency_list(grid):
             continue
 
         if i == 1:
+            node_positions.append((j, idx,))
             add_node_to_adjacency(adjacency, idx, j, node_count)
             grid[-1][idx] = str(node_count)
             node_count += 1
             break
 
     # return list of adjacency
-    return [str(node_count)] + adjacency
+    return [str(node_count)] + adjacency, node_positions
 
 
 def main():
@@ -165,8 +171,8 @@ def main():
     algorithm = args.algorithm
 
     # create grid and adjacency list from png file
-    grid = create_grid_from_image(maze)
-    adjacency_list = create_adjacency_list(grid)
+    grid, img = create_grid_from_image(maze)
+    adjacency_list, node_positions = create_adjacency_list(grid)
 
     # create graph from adjacency list
     graph = Graph()
@@ -178,9 +184,42 @@ def main():
 
     # solve using algorithm
     if algorithm == 'dijkstra':
-        graph.path(start, end, run_dijkstra=True)
+        dijkstra_path = graph.path(start, end, run_dijkstra=True)
     else:
         print('Not implemented yet :)')
+
+
+    img = img.convert('RGB')
+    img_pixels = img.load()
+
+    path = dijkstra_path.get('path')
+
+    length = len(path)
+
+    for udx in range(0, length - 1):
+        u = path[udx]
+        v = path[udx + 1]
+
+        # node positions in image
+        u_pos = node_positions[u.label]
+        v_pos = node_positions[v.label]
+
+        # pixel color
+        red_percentage = int((udx / length) * 255)
+        blue_percentage = 255 - red_percentage
+        pixel_color = (red_percentage, 0, blue_percentage)
+
+        if u_pos[0] == v_pos[0]:
+            # horizontal neighboors
+            for x in range(min(u_pos[1], v_pos[1]), max(u_pos[1], v_pos[1])):
+                img_pixels[x, u_pos[0]] = pixel_color
+
+        elif u_pos[1] == v_pos[1]:
+            # vertical neighboors
+            for y in range(min(u_pos[0], v_pos[0]), max(u_pos[0], v_pos[0]) + 1):
+                img_pixels[u_pos[1],y] = pixel_color
+
+    img.save('solutions/output.png')
 
 
 if __name__ == '__main__':

@@ -6,3 +6,6 @@ kitchen-decorator-scar/
 
 # examples
 mazes/
+
+# outputs
+solutions/
