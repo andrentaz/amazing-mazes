@@ -212,7 +212,7 @@ class Graph(object):
         start node.
 
         :param start: Vertex from which the search starts
-        :return search_tree: list of Edges from the search tree
+        :param end: Vertex which the path should end
         """
         start.distance = 0
         start.color = Vertex.Color.GREY
@@ -239,37 +239,29 @@ class Graph(object):
             # paint the node black
             node.color = Vertex.Color.BLACK
 
-        return search_tree
-
-    def depth_first_search(self, start, end=None, search_tree=[]):
+    def depth_first_search(self, start, end=None):
         """
         Run a Depth First Search algorithm in the given graph begining in the
         start node.
 
         :param start: Vertex from which the search starts
-        :return search_tree: list of Edges from the search tree
+        :param end: Vertex which the path should end
         """
-        start.distance = 0 if start.distance == float('inf') else start.distance
-        start.color = Vertex.Color.GREY
+        start.distance = 0
+        stack = [start]
 
-        if end.color == Vertex.Color.GREY:
-            return search_tree
+        while stack:
+            node = stack.pop()
+            node.color = Vertex.Color.GREY
 
-        for edge in start.edges:
-            neighboor = edge.neighboor
+            for edge in node.edges:
+                neighboor = edge.neighboor
 
-            if neighboor.color == Vertex.Color.WHITE:
-                neighboor.previous = edge.source
-                neighboor.distance = start.distance + edge.distance
-                search_tree.append(edge)
-                self.depth_first_search(
-                    start=neighboor,
-                    end=end,
-                    search_tree=search_tree,
-                )
+                if neighboor.color == Vertex.Color.WHITE:
+                    neighboor.previous = edge.source
+                    neighboor.distance = node.distance + edge.distance
+                    stack.append(neighboor)
 
-            if end.color == Vertex.Color.GREY:
-                break
+                    if end == neighboor:
+                        return
 
-        start.color = Vertex.Color.BLACK
-        return search_tree
