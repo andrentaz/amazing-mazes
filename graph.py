@@ -213,7 +213,7 @@ class Graph(object):
             'path': list(reversed(path)),
         }
 
-    def breadth_first_search(self, start):
+    def breadth_first_search(self, start, end=None):
         """
         Run a Breadth First Search algorithm in the given graph begining in the
         start node.
@@ -242,7 +242,7 @@ class Graph(object):
 
         return search_tree
 
-    def depth_first_search(self, start, search_tree=[]):
+    def depth_first_search(self, start, end=None, search_tree=[]):
         """
         Run a Depth First Search algorithm in the given graph begining in the
         start node.

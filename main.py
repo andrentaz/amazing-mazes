@@ -155,44 +155,10 @@ def create_adjacency_list(grid):
     return [str(node_count)] + adjacency, node_positions
 
 
-def main():
-    """Solve the maze using graphs"""
-    parser = argparse.ArgumentParser(
-        description='Calculate paths in mazes.'
-    )
-    parser.add_argument('maze',
-                        help='path to png file containing the the maze')
-    parser.add_argument('algorithm',
-                        help='what algorithm to find the path')
-    args = parser.parse_args()
-
-    # read arguments
-    maze = args.maze
-    algorithm = args.algorithm
-
-    # create grid and adjacency list from png file
-    grid, img = create_grid_from_image(maze)
-    adjacency_list, node_positions = create_adjacency_list(grid)
-
-    # create graph from adjacency list
-    graph = Graph()
-    graph.create(adjacency_list)
-
-    # get initial and final nodes
-    start = graph.vertexes[0]
-    end = graph.vertexes[-1]
-
-    # solve using algorithm
-    if algorithm == 'dijkstra':
-        dijkstra_path = graph.path(start, end, run_dijkstra=True)
-    else:
-        print('Not implemented yet :)')
-
-
-    img = img.convert('RGB')
+def create_solution_image(image, output, path, node_positions):
+    """Saves the path to a file"""
+    img = image.convert('RGB')
     img_pixels = img.load()
-
-    path = dijkstra_path.get('path')
 
     length = len(path)
 
@@ -219,7 +185,51 @@ def main():
             for y in range(min(u_pos[0], v_pos[0]), max(u_pos[0], v_pos[0]) + 1):
                 img_pixels[u_pos[1],y] = pixel_color
 
-    img.save('solutions/output.png')
+    img.save(output)
+
+
+def main():
+    """Solve the maze using graphs"""
+    parser = argparse.ArgumentParser(
+        description='Calculate paths in mazes.'
+    )
+    parser.add_argument('maze',
+                        help='path to png file containing the the maze')
+    parser.add_argument('algorithm',
+                        help='what algorithm to find the path')
+    parser.add_argument('solution_path',
+                        help='path to png file with the solution')
+    args = parser.parse_args()
+
+    # read arguments
+    maze = args.maze
+    algorithm = args.algorithm
+    solution_path = args.solution_path
+
+    # create grid and adjacency list from png file
+    grid, img = create_grid_from_image(maze)
+    adjacency_list, node_positions = create_adjacency_list(grid)
+
+    # create graph from adjacency list
+    graph = Graph()
+    graph.create(adjacency_list)
+
+    # get initial and final nodes
+    start = graph.vertexes[0]
+    end = graph.vertexes[-1]
+
+    # solve using algorithm
+    if algorithm == 'dijkstra':
+        path = graph.path(start, end, run_dijkstra=True)
+    else:
+        print('Not implemented yet :)')
+
+    create_solution_image(
+        image=img,
+        output=solution_path,
+        path=path.get('path'),
+        node_positions=node_positions,
+    )
 
 
 if __name__ == '__main__':
