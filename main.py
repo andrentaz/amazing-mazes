@@ -219,10 +219,13 @@ def main():
     end = graph.vertexes[-1]
 
     # solve using algorithm
-    if algorithm == 'dijkstra':
-        path = graph.path(start, end, run_dijkstra=True)
-    else:
-        print('Not implemented yet :)')
+    solver = getattr(graph, algorithm, None)
+    if not solver:
+        print('Not implemented yes :)')
+        return
+
+    solver(start=start, end=end)
+    path = graph.path(start, end)
 
     create_solution_image(
         image=img,

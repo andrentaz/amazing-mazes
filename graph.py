@@ -131,6 +131,38 @@ class Graph(object):
             vertex.visited = False
             vertex.color = Vertex.Color.WHITE
 
+    def path(self, start, end):
+        """
+        Get the shortest path from start to end after the dijkstra algorithm is
+        runned in the graph.
+
+        :param start: starting node
+        :param end: end node
+
+        :return path: dict with path from start to end and total distance
+        """
+        path = []
+
+        # case we have a disconnected graph
+        if end.distance == float('inf'):
+            return {
+                'distance': end.distance,
+                'path': path,
+            }
+
+        # get the reversed path
+        node = end
+        while node != start:
+            path.append(node)
+            node = node.previous
+
+        path.append(start)
+
+        return {
+            'distance': end.distance,
+            'path': list(reversed(path)),
+        }
+
     def dijkstra(self, start, end=None):
         """
         Run the dijkstra algorithm to find the shortest path from start node to
@@ -174,45 +206,6 @@ class Graph(object):
             if end and node == end:
                 break
 
-    def path(self, start, end, run_dijkstra=False):
-        """
-        Get the shortest path from start to end after the dijkstra algorithm is
-        runned in the graph.
-
-        :param start: starting node
-        :param end: end node
-        :param run_dijkstra: if true will run a complete dijkstra in the graph
-        previously to defining the shortest path between start and end.
-
-        :return path: dict with path from start to end and total distance
-        """
-        path = []
-
-        if not start.distance == 0:
-            if not run_dijkstra:
-                return None
-            self.dijkstra(start)
-
-        # case we have a disconnected graph
-        if end.distance == float('inf'):
-            return {
-                'distance': end.distance,
-                'path': path,
-            }
-
-        # get the reversed path
-        node = end
-        while node != start:
-            path.append(node)
-            node = node.previous
-
-        path.append(start)
-
-        return {
-            'distance': end.distance,
-            'path': list(reversed(path)),
-        }
-
     def breadth_first_search(self, start, end=None):
         """
         Run a Breadth First Search algorithm in the given graph begining in the
@@ -221,6 +214,7 @@ class Graph(object):
         :param start: Vertex from which the search starts
         :return search_tree: list of Edges from the search tree
         """
+        start.distance = 0
         start.color = Vertex.Color.GREY
         search_tree = []
         grey_nodes = Queue([start])
@@ -230,12 +224,17 @@ class Graph(object):
 
             for edge in node.edges:
                 neighboor = edge.neighboor
+
                 # add edge to search tree and color the node
                 if neighboor.color == Vertex.Color.WHITE:
                     search_tree.append(edge)
                     neighboor.color = Vertex.Color.GREY
+                    neighboor.previous = node
+                    neighboor.distance = node.distance + edge.distance
                     grey_nodes.add(neighboor)
 
+            if end and end.color == Vertex.Color.GREY:
+                break
 
             # paint the node black
             node.color = Vertex.Color.BLACK
@@ -250,17 +249,27 @@ class Graph(object):
         :param start: Vertex from which the search starts
         :return search_tree: list of Edges from the search tree
         """
+        start.distance = 0 if start.distance == float('inf') else start.distance
         start.color = Vertex.Color.GREY
+
+        if end.color == Vertex.Color.GREY:
+            return search_tree
 
         for edge in start.edges:
             neighboor = edge.neighboor
 
             if neighboor.color == Vertex.Color.WHITE:
+                neighboor.previous = edge.source
+                neighboor.distance = start.distance + edge.distance
                 search_tree.append(edge)
                 self.depth_first_search(
                     start=neighboor,
+                    end=end,
                     search_tree=search_tree,
                 )
+
+            if end.color == Vertex.Color.GREY:
+                break
 
         start.color = Vertex.Color.BLACK
         return search_tree
