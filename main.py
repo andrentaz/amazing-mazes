@@ -213,6 +213,7 @@ def main():
     # create graph from adjacency list
     graph = Graph()
     graph.create(adjacency_list)
+    graph.set_node_positions(node_positions)
 
     # get initial and final nodes
     start = graph.vertexes[0]

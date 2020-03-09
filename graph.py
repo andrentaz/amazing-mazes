@@ -8,6 +8,8 @@ A program that implements dijkstras algorithm for shortest path.
 """
 from __future__ import absolute_import, unicode_literals
 
+import math
+
 from enum import Enum
 
 from helpers import BinaryMinHeap, Queue
@@ -49,6 +51,7 @@ class Vertex(object):
         self.previous = None
         self.visited = False
         self.color = Vertex.Color.WHITE
+        self.position = None
 
     def __repr__(self):
         return (
@@ -131,6 +134,10 @@ class Graph(object):
             vertex.visited = False
             vertex.color = Vertex.Color.WHITE
 
+    def set_node_positions(self, node_positions):
+        for node in self.vertexes:
+            node.position = node_positions[node.label]
+
     def path(self, start, end):
         """
         Get the shortest path from start to end after the dijkstra algorithm is
@@ -205,6 +212,39 @@ class Graph(object):
 
             if end and node == end:
                 break
+
+    def a_star(self, start, end):
+        """
+        Run the A* (A-Star) algorithm to find the shortest path from start node
+        to end node.
+
+        The Algorithm is a slightly changed version of Dijkstra, adding some
+        kind of heuristic to guide the search.
+
+        For this implementation, we use the euclidean distance as the heuristic
+        making the search prioritize nodes that guide you closer to the end
+
+        :param start: starting node
+        :param end: end node
+        """
+
+        # heuristic distance
+        def heuristic_dist(node):
+            distance = node.distance
+
+            u_pos = node.position
+            v_pos = end.position
+
+            x_axis = ((u_pos[0] - v_pos[0])) ** 2
+            y_axis = ((u_pos[1] - v_pos[1])) ** 2
+            euclidean_distance = math.sqrt(x_axis + y_axis)
+
+            return distance + euclidean_distance
+
+        Vertex.__gt__ = lambda x,y: heuristic_dist(x) > heuristic_dist(y)
+
+        # run dijkstra now
+        self.dijkstra(start, end)
 
     def breadth_first_search(self, start, end=None):
         """
