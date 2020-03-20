@@ -304,4 +304,3 @@ class Graph(object):
 
                     if end == neighboor:
                         return
-

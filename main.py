@@ -85,7 +85,7 @@ def create_adjacency_list(grid):
         if i == 0:
             continue
 
-        if i == 1:
+        if i > 0:
             node_positions.append((0, idx,))
             add_node_to_adjacency(adjacency, 0, idx, node_count)
             grid[0][idx] = str(node_count)
@@ -107,10 +107,10 @@ def create_adjacency_list(grid):
             right = grid[i][j+1]
 
             # convert it to a number
-            top = top if not isinstance(top, str) else 1
-            bottom = bottom if not isinstance(bottom, str) else 1
-            left = left if not isinstance(left, str) else 1
-            right = right if not isinstance(right, str) else 1
+            top = int(top > 0) if not isinstance(top, str) else 1
+            bottom = int(bottom > 0) if not isinstance(bottom, str) else 1
+            left = int(left > 0) if not isinstance(left, str) else 1
+            right = int(right > 0) if not isinstance(right, str) else 1
 
             freedom_degree = top + bottom + left + right
 
@@ -144,7 +144,7 @@ def create_adjacency_list(grid):
         if i == 0:
             continue
 
-        if i == 1:
+        if i > 0:
             node_positions.append((j, idx,))
             add_node_to_adjacency(adjacency, idx, j, node_count)
             grid[-1][idx] = str(node_count)
